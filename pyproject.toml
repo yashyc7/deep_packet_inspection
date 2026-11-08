@@ -1,0 +1,33 @@
+[project]
+name = "deep-packet-inspection"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Yash Chauhan", email = "yashc9411407582@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.14.3",
+    "scapy>=2.8.0",
+    "structlog>=26.1.0",
+    "typer>=0.28.0",
+]
+
+[project.scripts]
+deep-packet-inspection = "deep_packet_inspection:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.4",
+]
+
+[tool.ruff.lint]
+ignore = ["I001"]
