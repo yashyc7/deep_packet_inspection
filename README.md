@@ -18,13 +18,17 @@ The solid path below is implemented. Dashed stages show the intended direction o
 
 `PacketParser` currently expects Ethernet-framed bytes. It extracts link, network, and transport metadata for supported Ethernet, IPv4, IPv6, TCP, UDP, and ARP packets.
 
-![Conceptual layout of an Ethernet frame containing network, transport, and payload data](docs/images/packet-encapsulation.svg)
+![Packet hierarchy showing Ethernet, IP, TCP, and payload fields](image-1.png)
+
+In an encapsulated Ethernet packet, each transport segment is enclosed by the protocols beneath it. The TCP header and payload may also be nested inside an outer protocol, as illustrated below.
+
+![TCP-in-TCP example showing Ethernet, IPv4, and TCP headers and bodies](image-2.png)
 
 ### 3. Use normalized metadata
 
 The parser returns a `ParsedPacket` record with nullable fields where a layer is not present. For example, an ARP packet has no IP addresses or TCP/UDP ports.
 
-![PacketParser maps frame details into the ParsedPacket fields](docs/images/parsed-metadata.svg)
+![Encapsulation process adding application data, TCP headers and ports, IP headers and addresses, and Ethernet headers and MAC addresses](image.png)
 
 ## Current features
 
