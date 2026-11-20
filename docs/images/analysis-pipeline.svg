@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
+  <title id="title">Deep Packet Inspection project pipeline</title>
+  <desc id="desc">The implemented PCAP reader and packet parser produce normalized metadata. Planned stages continue through flow tracking, application inspection, classification, rules, and reports or filtered PCAP output.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#52708f"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172b4d; }
+      .title { font-size: 25px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .detail { font-size: 13px; fill: #42526e; }
+      .box { fill: #f5f8fc; stroke: #52708f; stroke-width: 2; rx: 12; }
+      .live { fill: #e4f7ef; stroke: #16835d; }
+      .planned { fill: #f8f9fb; stroke: #8493a8; stroke-dasharray: 8 6; }
+      .line { fill: none; stroke: #52708f; stroke-width: 2.5; marker-end: url(#arrow); }
+      .futureLine { fill: none; stroke: #8493a8; stroke-width: 2.5; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1000" height="650" fill="#ffffff"/>
+  <text x="500" y="42" text-anchor="middle" class="title">From capture file to useful packet metadata</text>
+
+  <rect x="28" y="71" width="170" height="54" rx="10" class="live"/>
+  <text x="113" y="95" text-anchor="middle" class="label">PCAP file</text>
+  <text x="113" y="114" text-anchor="middle" class="detail">offline input</text>
+
+  <rect x="242" y="71" width="205" height="54" rx="10" class="live"/>
+  <text x="344" y="95" text-anchor="middle" class="label">PCAP reader</text>
+  <text x="344" y="114" text-anchor="middle" class="detail">timestamp + bytes</text>
+
+  <rect x="492" y="71" width="205" height="54" rx="10" class="live"/>
+  <text x="594" y="95" text-anchor="middle" class="label">Packet parser</text>
+  <text x="594" y="114" text-anchor="middle" class="detail">Ethernet, IP, TCP/UDP, ARP</text>
+
+  <rect x="742" y="71" width="230" height="54" rx="10" class="live"/>
+  <text x="857" y="95" text-anchor="middle" class="label">ParsedPacket</text>
+  <text x="857" y="114" text-anchor="middle" class="detail">normalized metadata</text>
+
+  <path d="M198 98H235" class="line"/>
+  <path d="M447 98H485" class="line"/>
+  <path d="M697 98H735" class="line"/>
+
+  <rect x="25" y="148" width="185" height="32" rx="16" fill="#e4f7ef"/>
+  <text x="117" y="170" text-anchor="middle" class="detail" font-weight="700">IMPLEMENTED</text>
+  <rect x="25" y="197" width="185" height="32" rx="16" fill="#f1f3f6"/>
+  <text x="117" y="219" text-anchor="middle" class="detail" font-weight="700">PLANNED</text>
+
+  <rect x="242" y="268" width="205" height="62" class="planned"/>
+  <text x="344" y="293" text-anchor="middle" class="label">Flow tracker</text>
+  <text x="344" y="314" text-anchor="middle" class="detail">group conversations</text>
+
+  <rect x="492" y="268" width="205" height="62" class="planned"/>
+  <text x="594" y="293" text-anchor="middle" class="label">DPI / metadata</text>
+  <text x="594" y="314" text-anchor="middle" class="detail">inspect supported indicators</text>
+
+  <rect x="742" y="268" width="230" height="62" class="planned"/>
+  <text x="857" y="293" text-anchor="middle" class="label">Classifier</text>
+  <text x="857" y="314" text-anchor="middle" class="detail">combine available signals</text>
+
+  <path d="M857 125V230H344V260" class="futureLine"/>
+  <path d="M447 299H485" class="futureLine"/>
+  <path d="M697 299H735" class="futureLine"/>
+
+  <rect x="492" y="402" width="205" height="62" class="planned"/>
+  <text x="594" y="427" text-anchor="middle" class="label">Rules engine</text>
+  <text x="594" y="448" text-anchor="middle" class="detail">evaluate configured rules</text>
+
+  <rect x="258" y="535" width="245" height="62" class="planned"/>
+  <text x="380" y="560" text-anchor="middle" class="label">Filtered PCAP</text>
+  <text x="380" y="581" text-anchor="middle" class="detail">selected packets</text>
+
+  <rect x="684" y="535" width="245" height="62" class="planned"/>
+  <text x="806" y="560" text-anchor="middle" class="label">Reports</text>
+  <text x="806" y="581" text-anchor="middle" class="detail">packet / protocol / flow stats</text>
+
+  <path d="M857 330V372H594V394" class="futureLine"/>
+  <path d="M540 464V497H380V527" class="futureLine"/>
+  <path d="M648 464V497H806V527" class="futureLine"/>
+
+  <text x="500" y="628" text-anchor="middle" class="detail">Solid green = available now · Dashed gray = planned</text>
+</svg>

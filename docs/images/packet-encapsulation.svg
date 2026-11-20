@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="350" viewBox="0 0 1000 350" role="img" aria-labelledby="title desc">
+  <title id="title">Packet encapsulation at a glance</title>
+  <desc id="desc">An Ethernet frame contains an IP header, which may contain a TCP or UDP header, followed by transport payload. ARP is another supported Ethernet payload and does not have IP or TCP/UDP fields.</desc>
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172b4d; }
+      .title { font-size: 24px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .detail { font-size: 14px; fill: #42526e; }
+      .ether { fill: #eee8ff; stroke: #7053b1; stroke-width: 2; }
+      .ip { fill: #fff0d9; stroke: #bd7620; stroke-width: 2; }
+      .transport { fill: #dceeff; stroke: #3974ac; stroke-width: 2; }
+      .payload { fill: #ddf5e9; stroke: #378562; stroke-width: 2; }
+    </style>
+  </defs>
+  <rect width="1000" height="350" fill="#ffffff"/>
+  <text x="500" y="42" text-anchor="middle" class="title">A packet is layered data</text>
+
+  <rect x="48" y="94" width="904" height="74" rx="9" class="ether"/>
+  <text x="500" y="83" text-anchor="middle" class="detail">Ethernet frame</text>
+  <rect x="64" y="111" width="162" height="42" rx="6" class="ip"/>
+  <text x="145" y="138" text-anchor="middle" class="label">IP header</text>
+  <rect x="238" y="111" width="174" height="42" rx="6" class="transport"/>
+  <text x="325" y="138" text-anchor="middle" class="label">TCP / UDP</text>
+  <rect x="424" y="111" width="510" height="42" rx="6" class="payload"/>
+  <text x="679" y="138" text-anchor="middle" class="label">Transport payload</text>
+
+  <path d="M145 168V204" stroke="#7053b1" stroke-width="2"/>
+  <path d="M325 168V204" stroke="#3974ac" stroke-width="2"/>
+  <path d="M679 168V204" stroke="#378562" stroke-width="2"/>
+  <text x="145" y="228" text-anchor="middle" class="detail">IP addresses</text>
+  <text x="325" y="228" text-anchor="middle" class="detail">Ports + protocol</text>
+  <text x="679" y="228" text-anchor="middle" class="detail">Payload byte count</text>
+
+  <rect x="64" y="264" width="270" height="48" rx="8" class="ether"/>
+  <text x="199" y="294" text-anchor="middle" class="label">Ethernet MAC addresses</text>
+  <rect x="366" y="264" width="568" height="48" rx="8" fill="#f5f8fc" stroke="#8493a8" stroke-width="2"/>
+  <text x="650" y="284" text-anchor="middle" class="label">ARP is recognized separately</text>
+  <text x="650" y="303" text-anchor="middle" class="detail">No IP addresses or TCP / UDP ports are set for ARP</text>
+</svg>

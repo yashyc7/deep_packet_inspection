@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="390" viewBox="0 0 1000 390" role="img" aria-labelledby="title desc">
+  <title id="title">How packet parsing produces normalized metadata</title>
+  <desc id="desc">A timestamp and Ethernet frame bytes enter PacketParser. It extracts MAC addresses, IP addresses when present, protocol, ports when TCP or UDP is present, and transport payload size into a ParsedPacket record.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#52708f"/>
+    </marker>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172b4d; }
+      .title { font-size: 24px; font-weight: 700; }
+      .label { font-size: 17px; font-weight: 700; }
+      .detail { font-size: 14px; fill: #42526e; }
+      .box { fill: #f5f8fc; stroke: #52708f; stroke-width: 2; rx: 12; }
+      .accent { fill: #e4f7ef; stroke: #16835d; stroke-width: 2; rx: 12; }
+      .line { stroke: #52708f; stroke-width: 2.5; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1000" height="390" fill="#ffffff"/>
+  <text x="500" y="42" text-anchor="middle" class="title">From frame bytes to a predictable record</text>
+
+  <rect x="38" y="105" width="210" height="150" class="box"/>
+  <text x="143" y="137" text-anchor="middle" class="label">CapturedPacket</text>
+  <text x="60" y="173" class="detail">timestamp: float</text>
+  <text x="60" y="203" class="detail">raw_data: bytes</text>
+  <text x="60" y="233" class="detail">Ethernet-framed input</text>
+
+  <line x1="260" y1="180" x2="351" y2="180" class="line"/>
+
+  <rect x="365" y="125" width="245" height="110" class="accent"/>
+  <text x="487" y="168" text-anchor="middle" class="label">PacketParser</text>
+  <text x="487" y="198" text-anchor="middle" class="detail">extract supported layers</text>
+
+  <line x1="622" y1="180" x2="713" y2="180" class="line"/>
+
+  <rect x="728" y="79" width="235" height="204" class="box"/>
+  <text x="845" y="111" text-anchor="middle" class="label">ParsedPacket</text>
+  <text x="750" y="146" class="detail">MAC + IP addresses</text>
+  <text x="750" y="176" class="detail">protocol + ports</text>
+  <text x="750" y="206" class="detail">payload_size</text>
+  <text x="750" y="246" class="detail">missing layers: None</text>
+
+  <text x="500" y="337" text-anchor="middle" class="detail">For example: ARP sets protocol = "ARP"; IP and port fields remain None.</text>
+</svg>
