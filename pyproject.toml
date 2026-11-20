@@ -1,7 +1,7 @@
 [project]
 name = "deep-packet-inspection"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Offline deep packet inspection: parse PCAPs, classify apps via TLS SNI / HTTP Host, apply blocking rules, and emit filtered captures with reports."
 readme = "README.md"
 authors = [
     { name = "Yash Chauhan", email = "yashc9411407582@gmail.com" }
@@ -15,7 +15,8 @@ dependencies = [
 ]
 
 [project.scripts]
-deep-packet-inspection = "deep_packet_inspection:main"
+deep-packet-inspection = "deep_packet_inspection.cli:main"
+dpi = "deep_packet_inspection.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.12.17,<0.13.0"]
@@ -29,5 +30,41 @@ dev = [
     "ruff>=0.17.4",
 ]
 
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src"]
+
 [tool.ruff.lint]
-ignore = ["I001"]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "C4",  # flake8-comprehensions
+    "RUF", # ruff-specific
+]
+ignore = [
+    "B008", # Typer Argument/Option in function defaults is intentional
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+"scripts/**" = ["T201"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+addopts = "--basetemp=pytest-tmp"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["deep_packet_inspection"]
+omit = ["*/__main__.py"]

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="520" viewBox="0 0 1000 520" role="img" aria-labelledby="title desc">
+  <title id="title">TLS SNI extraction</title>
+  <desc id="desc">Even with HTTPS encryption, the TLS Client Hello carries the destination hostname in plaintext via the SNI extension.</desc>
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172b4d; }
+      .title { font-size: 22px; font-weight: 700; }
+      .label { font-size: 14px; font-weight: 700; }
+      .detail { font-size: 12px; fill: #42526e; }
+      .layer { stroke: #52708f; stroke-width: 2; }
+    </style>
+  </defs>
+  <rect width="1000" height="520" fill="#ffffff"/>
+  <text x="500" y="36" text-anchor="middle" class="title">Why SNI enables DPI without decrypting HTTPS</text>
+
+  <rect x="80" y="70" width="840" height="48" fill="#dfe7f2" class="layer" rx="8"/>
+  <text x="100" y="100" class="label">Ethernet + IP + TCP headers</text>
+
+  <rect x="80" y="130" width="840" height="56" fill="#e8f0fa" class="layer" rx="8"/>
+  <text x="100" y="155" class="label">TLS record — ContentType=0x16 (Handshake)</text>
+  <text x="100" y="175" class="detail">Version + record length</text>
+
+  <rect x="80" y="198" width="840" height="56" fill="#e4f7ef" class="layer" rx="8"/>
+  <text x="100" y="223" class="label">Handshake — type=0x01 (Client Hello)</text>
+  <text x="100" y="243" class="detail">Client version, random, session ID, cipher suites…</text>
+
+  <rect x="80" y="266" width="840" height="90" fill="#fff6e5" stroke="#c27c14" stroke-width="2" rx="8"/>
+  <text x="100" y="295" class="label">Extensions → SNI (type 0x0000)</text>
+  <text x="100" y="320" class="detail">hostname: www.youtube.com   ← plaintext before encryption starts</text>
+  <text x="100" y="342" class="detail">Mapped by classifier → AppType.YOUTUBE</text>
+
+  <rect x="80" y="380" width="840" height="100" fill="#f5f8fc" stroke="#8493a8" stroke-width="2" rx="8"/>
+  <text x="100" y="415" class="label">Also supported</text>
+  <text x="100" y="440" class="detail">HTTP Host header on cleartext port 80 · DNS QNAME on UDP/TCP port 53</text>
+  <text x="100" y="462" class="detail">Port fallbacks: 443 → HTTPS, 80 → HTTP when no deep signal is present</text>
+</svg>

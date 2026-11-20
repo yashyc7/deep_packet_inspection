@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="420" viewBox="0 0 1000 420" role="img" aria-labelledby="title desc">
+  <title id="title">Five-tuple flow tracking</title>
+  <desc id="desc">Packets sharing the same source IP, destination IP, ports, and protocol map to one flow entry with counters and classification.</desc>
+  <defs>
+    <style>
+      text { font-family: Arial, Helvetica, sans-serif; fill: #172b4d; }
+      .title { font-size: 22px; font-weight: 700; }
+      .label { font-size: 15px; font-weight: 700; }
+      .detail { font-size: 13px; fill: #42526e; }
+      .box { fill: #f5f8fc; stroke: #52708f; stroke-width: 2; }
+      .accent { fill: #e4f7ef; stroke: #16835d; stroke-width: 2; }
+    </style>
+  </defs>
+  <rect width="1000" height="420" fill="#ffffff"/>
+  <text x="500" y="36" text-anchor="middle" class="title">Five-tuple identifies a unidirectional flow</text>
+
+  <rect x="40" y="70" width="420" height="220" rx="12" class="box"/>
+  <text x="250" y="100" text-anchor="middle" class="label">FiveTuple key</text>
+  <text x="70" y="140" class="detail">src_ip      192.168.1.100</text>
+  <text x="70" y="168" class="detail">dst_ip      142.250.185.110</text>
+  <text x="70" y="196" class="detail">src_port    50000</text>
+  <text x="70" y="224" class="detail">dst_port    443</text>
+  <text x="70" y="252" class="detail">protocol    TCP</text>
+
+  <rect x="540" y="70" width="420" height="220" rx="12" class="accent"/>
+  <text x="750" y="100" text-anchor="middle" class="label">Flow state</text>
+  <text x="570" y="140" class="detail">packet_count / byte_count</text>
+  <text x="570" y="168" class="detail">sni → www.youtube.com</text>
+  <text x="570" y="196" class="detail">app_type → YouTube</text>
+  <text x="570" y="224" class="detail">blocked → true | false</text>
+  <text x="570" y="252" class="detail">first_seen / last_seen</text>
+
+  <text x="500" y="340" text-anchor="middle" class="detail">All packets with the same five-tuple share one Flow.</text>
+  <text x="500" y="368" text-anchor="middle" class="detail">Once blocked, every later packet on that flow is dropped.</text>
+  <text x="500" y="396" text-anchor="middle" class="detail">Reverse direction (server → client) is a separate unidirectional flow.</text>
+</svg>

@@ -1,178 +1,284 @@
 # Deep Packet Inspection
 
-A Python learning project for reading packet captures and extracting useful network metadata. The current implementation reads a PCAP file and parses Ethernet-framed packets into normalized records. Flow tracking, application-layer inspection, filtering, and reporting are planned, but are not implemented yet.
+Python remake of [perryvegehan/Packet_analyzer](https://github.com/perryvegehan/Packet_analyzer): an offline DPI engine that reads a PCAP, parses packets, tracks flows, extracts TLS SNI / HTTP Host / DNS names, classifies applications, applies block rules, writes a filtered PCAP, and prints a processing report.
 
-> **Status:** Early development. Offline PCAP reading and basic packet parsing are available; the broader DPI pipeline is a roadmap.
+> **Status:** Complete single-threaded offline pipeline (reader → parser → flows → DPI → rules → writer → report). Multi-threaded load-balancer / fast-path workers from the C++ project are intentionally out of scope for this learning remake.
 
-## How packet analysis flows
+---
 
-The solid path below is implemented. Dashed stages show the intended direction of development, not current features.
+## What it does
 
-![Implemented PCAP reading and packet parsing flow, followed by planned flow tracking, inspection, and reporting stages](docs/images/analysis-pipeline.svg)
+```text
+User traffic (PCAP) → [DPI Engine] → Filtered traffic (PCAP)
+                           ↓
+                    - Identifies apps (YouTube, Facebook, GitHub, …)
+                    - Blocks by IP / app / domain
+                    - Generates a processing report
+```
 
-### 1. Read a capture
+| Capability | Status |
+|---|---|
+| Streaming PCAP read | Done |
+| Ethernet / IPv4 / IPv6 / TCP / UDP / ARP parse | Done |
+| Five-tuple flow tracking | Done |
+| TLS SNI extraction | Done |
+| HTTP Host extraction | Done |
+| DNS query name extraction | Done |
+| Application classification | Done |
+| Block rules (IP / app / domain) | Done |
+| Filtered PCAP output | Done |
+| CLI + processing report | Done |
+| Multi-threaded LB / FP pipeline | Not in this remake |
 
-`PcapFileReader` iterates through a capture instead of loading all packets into memory at once. Each `CapturedPacket` contains a timestamp and serialized packet bytes.
+---
 
-### 2. Parse a packet
+## Architecture
 
-`PacketParser` currently expects Ethernet-framed bytes. It extracts link, network, and transport metadata for supported Ethernet, IPv4, IPv6, TCP, UDP, and ARP packets.
+![End-to-end DPI pipeline from PCAP input through inspection, rules, filtered output, and reports](docs/images/analysis-pipeline.svg)
 
-![Packet hierarchy showing Ethernet, IP, TCP, and payload fields](image-1.png)
+### Packet journey
 
-In an encapsulated Ethernet packet, each transport segment is enclosed by the protocols beneath it. The TCP header and payload may also be nested inside an outer protocol, as illustrated below.
+1. **Read** — `PcapFileReader` streams frames (timestamp + bytes).
+2. **Parse** — `PacketParser` extracts L2/L3/L4 metadata and transport payload.
+3. **Track** — `FlowTracker` upserts a unidirectional five-tuple `Flow`.
+4. **Inspect** — TLS SNI, HTTP Host, or DNS QNAME when visible in the payload.
+5. **Classify** — map domain → `AppType` (with port fallbacks).
+6. **Filter** — `RuleManager` marks flows blocked by IP / app / domain.
+7. **Write** — allowed packets go to the output PCAP.
+8. **Report** — packet / flow / application breakdown.
 
-![TCP-in-TCP example showing Ethernet, IPv4, and TCP headers and bodies](image-2.png)
+![Five-tuple key mapped to flow state with counters, SNI, app type, and blocked flag](docs/images/five-tuple-flow.svg)
 
-### 3. Use normalized metadata
+![TLS Client Hello SNI extension carrying the hostname in plaintext](docs/images/sni-extraction.svg)
 
-The parser returns a `ParsedPacket` record with nullable fields where a layer is not present. For example, an ARP packet has no IP addresses or TCP/UDP ports.
+![Rule evaluation: block-ip, block-app, block-domain leading to DROP or FORWARD](docs/images/blocking-rules.svg)
 
-![Encapsulation process adding application data, TCP headers and ports, IP headers and addresses, and Ethernet headers and MAC addresses](image.png)
+Additional layering diagrams:
 
-## Current features
+![Packet hierarchy showing Ethernet, IP, TCP, and payload](image-1.png)
 
-- Incremental offline reading through Scapy's `PcapReader`.
-- Immutable `CapturedPacket` records with timestamp and packet bytes.
-- Ethernet source and destination MAC address extraction.
-- IPv4 and IPv6 source and destination address extraction.
-- TCP or UDP protocol and port extraction, plus transport payload size.
-- ARP recognition.
-- Unit tests for PCAP reading and supported packet parsing.
+![Encapsulation adding application data, TCP, IP, and Ethernet headers](image.png)
+
+---
 
 ## Quick start
 
 ### Requirements
 
-- Python 3.12 or newer
+- Python **3.12+**
 - [uv](https://docs.astral.sh/uv/)
-- A PCAP file readable by Scapy. The current parser expects Ethernet-framed packets.
 
 ### Install
-
-From the repository root, synchronize the environment:
 
 ```cmd
 uv sync
 ```
 
-### Analyze a capture
+### Generate a demo capture
 
-The reader and parser can be used directly from Python:
+```cmd
+uv run python scripts/generate_test_pcap.py -o test_dpi.pcap
+```
+
+### Analyze and filter
+
+```cmd
+uv run dpi test_dpi.pcap output.pcap --block-app YouTube --block-ip 192.168.1.50
+```
+
+Equivalent entry points:
+
+```cmd
+uv run deep-packet-inspection test_dpi.pcap output.pcap --block-domain facebook
+uv run python -m deep_packet_inspection test_dpi.pcap output.pcap
+```
+
+### Example report (from the demo capture)
+
+```text
+╔══════════════════════════════════════════════════════════════╗
+║              DPI ENGINE — Deep Packet Inspection             ║
+╚══════════════════════════════════════════════════════════════╝
+
+[Rules] Blocked IP: 192.168.1.50
+[Rules] Blocked app: YouTube
+[DPI] Processing packets...
+[BLOCKED] 192.168.1.100 -> 142.250.185.110 (YOUTUBE: www.youtube.com)
+[BLOCKED] 192.168.1.50 -> 1.1.1.1 (HTTPS)
+
+╔══════════════════════════════════════════════════════════════╗
+║                    PROCESSING REPORT                         ║
+╠══════════════════════════════════════════════════════════════╣
+║  Total Packets:           7                                  ║
+║  Forwarded:               5                                  ║
+║  Dropped:                 2                                  ║
+║  Active Flows:            7                                  ║
+╠══════════════════════════════════════════════════════════════╣
+║                  APPLICATION BREAKDOWN                       ║
+╠══════════════════════════════════════════════════════════════╣
+║  HTTPS                 3   42.9%                             ║
+║  YouTube               1   14.3%                             ║
+║  Facebook              1   14.3%                             ║
+║  GitHub                1   14.3%                             ║
+║  DNS                   1   14.3%                             ║
+╚══════════════════════════════════════════════════════════════╝
+
+[Detected Applications/Domains]
+  - example.com -> HTTPS
+  - github.com -> GitHub
+  - www.example.com -> HTTPS
+  - www.facebook.com -> Facebook
+  - www.google.com -> DNS
+  - www.youtube.com -> YouTube
+```
+
+---
+
+## Library usage
 
 ```python
-from deep_packet_inspection.capture.pcap_reader import PcapFileReader
-from deep_packet_inspection.parser.packet_parser import PacketParser
+from deep_packet_inspection.engine import DpiEngine
+from deep_packet_inspection.rules import RuleManager
+
+rules = RuleManager()
+rules.block_app("YouTube")
+rules.block_ip("192.168.1.50")
+rules.block_domain("facebook")
+
+engine = DpiEngine(rules=rules)
+stats = engine.process("input.pcap", "filtered.pcap")
+print(stats.total_packets, stats.forwarded_packets, stats.dropped_packets)
+```
+
+Lower-level building blocks:
+
+```python
+from deep_packet_inspection.capture import PcapFileReader
+from deep_packet_inspection.parser import PacketParser
 
 parser = PacketParser()
-
-for captured in PcapFileReader("path/to/capture.pcap"):
+for captured in PcapFileReader("capture.pcap"):
     packet = parser.parse(captured.timestamp, captured.raw_data)
-    print(
-        packet.protocol,
-        packet.src_ip,
-        packet.src_port,
-        "->",
-        packet.dst_ip,
-        packet.dst_port,
-    )
+    print(packet.protocol, packet.src_ip, packet.dst_ip, packet.payload_size)
 ```
 
-This prints metadata only; it does not identify applications, inspect TLS SNI, or apply filtering rules.
-
-## Data records
-
-### `CapturedPacket`
-
-Produced by `PcapFileReader`:
-
-| Field | Type | Meaning |
-|---|---|---|
-| `timestamp` | `float` | Capture timestamp |
-| `raw_data` | `bytes` | Serialized packet bytes |
-
-### `ParsedPacket`
-
-Produced by `PacketParser.parse(timestamp, raw_data)`:
-
-| Field | Type | Meaning |
-|---|---|---|
-| `timestamp` | `float` | Capture timestamp |
-| `src_mac`, `dst_mac` | `str \| None` | Ethernet source and destination addresses |
-| `src_ip`, `dst_ip` | `str \| None` | IPv4 or IPv6 source and destination addresses |
-| `protocol` | `str` | `TCP`, `UDP`, `ARP`, or `OTHER` |
-| `src_port`, `dst_port` | `int \| None` | TCP or UDP source and destination ports |
-| `payload_size` | `int` | Number of bytes beneath the TCP or UDP layer, or zero when not extracted |
-
-## Roadmap
-
-1. Complete and broaden packet parser validation.
-2. Track bidirectional network flows.
-3. Extract supported application metadata, such as TLS SNI when visible.
-4. Classify traffic using protocol and application metadata.
-5. Add configurable rules and a processing engine.
-6. Write selected packets to a filtered PCAP.
-7. Generate packet, protocol, and flow reports.
-8. Profile and optimize where measurements show a need.
-9. Consider optional live capture after the offline pipeline is stable.
-
-The planned end-to-end design is shown below. Only the reader and parser stages are currently implemented.
-
-![Target analysis flow from PCAP input through classification, rules, and report or filtered capture output](docs/images/analysis-pipeline.svg)
-
-## Development
-
-Run the test suite:
-
-```cmd
-uv run pytest -v
-```
-
-Run lint:
-
-```cmd
-uv run ruff check src tests
-```
-
-Run tests with coverage:
-
-```cmd
-uv run pytest --cov=deep_packet_inspection --cov-report=term-missing
-```
-
-The project uses Python, [Scapy](https://scapy.net/), [pytest](https://docs.pytest.org/), [Ruff](https://docs.astral.sh/ruff/), and [uv](https://docs.astral.sh/uv/). Pydantic, Typer, and structlog are declared dependencies for planned or evolving functionality.
+---
 
 ## Repository layout
 
 ```text
 deep_packet_inspection/
-├── docs/
-│   └── images/                  # README diagrams
+├── docs/images/                 # Architecture diagrams (SVG)
+├── scripts/
+│   └── generate_test_pcap.py    # Demo multi-protocol PCAP generator
 ├── src/deep_packet_inspection/
-│   ├── capture/
-│   │   └── pcap_reader.py
-│   └── parser/
-│       └── packet_parser.py
-├── tests/
-│   ├── test_packet_parser.py
-│   └── test_pcap_reader.py
+│   ├── capture/                 # PCAP reader + writer
+│   ├── parser/                  # L2/L3/L4 metadata + payload
+│   ├── flow/                    # FiveTuple, Flow, FlowTracker, AppType
+│   ├── inspection/              # SNI, HTTP Host, DNS, classifier
+│   ├── rules/                   # Block IP / app / domain
+│   ├── engine/                  # Pipeline + report formatter
+│   ├── util/                    # Synthetic TLS/DNS builders
+│   └── cli.py                   # Typer CLI (`dpi`)
+├── tests/                       # Unit + integration tests
 ├── pyproject.toml
 └── README.md
 ```
 
-## Current limitations
+---
 
-- The parser decodes input with `Ether(raw_data)` and does not explicitly support non-Ethernet link-layer formats.
-- This is a basic metadata parser, not a complete protocol dissector or intrusion-detection system.
-- Application identification, TLS SNI extraction, flow tracking, classification, filtering, and reporting are not implemented.
-- Port numbers alone do not reliably identify an application.
-- Live capture is not implemented; future live capture may require platform-specific drivers and permissions.
-- Existing tests use synthetic packet data; validation against a wider range of real-world captures remains future work.
+## Test results
+
+All automated tests were run on **Windows / Python 3.12.16** with `pytest` + `pytest-cov`.
+
+```cmd
+uv run pytest -v --cov=deep_packet_inspection --cov-report=term-missing
+uv run ruff check src tests
+```
+
+### Summary
+
+| Metric | Result |
+|---|---|
+| Tests collected | **25** |
+| Passed | **25** |
+| Failed | **0** |
+| Line coverage | **~91%** |
+| Ruff lint | **All checks passed** |
+
+### Suite breakdown
+
+| Module | What it covers | Cases |
+|---|---|---|
+| `test_pcap_reader.py` | Streaming read, missing/invalid/empty files | 4 |
+| `test_packet_parser.py` | TCP / UDP / ARP / IPv6 parse + payload | 4 |
+| `test_flow_tracker.py` | Five-tuple aggregation, reverse flows, ARP skip | 3 |
+| `test_inspection.py` | SNI, HTTP Host, DNS, app mapping | 6 |
+| `test_rules.py` | IP / app / domain blocks + unknown app | 4 |
+| `test_engine.py` | End-to-end classify, report, filtering | 2 |
+| `test_cli.py` | Typer CLI success + missing input | 2 |
+
+### Latest pytest output (abbreviated)
+
+```text
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0
+collected 25 items
+
+tests/test_cli.py ...................... PASSED
+tests/test_engine.py ................... PASSED
+tests/test_flow_tracker.py ............. PASSED
+tests/test_inspection.py ............... PASSED
+tests/test_packet_parser.py ............ PASSED
+tests/test_pcap_reader.py .............. PASSED
+tests/test_rules.py .................... PASSED
+
+TOTAL coverage ~91%
+============================= 25 passed in 0.87s ==============================
+```
+
+---
+
+## Development
+
+```cmd
+uv sync
+uv run pytest -v
+uv run pytest --cov=deep_packet_inspection --cov-report=term-missing
+uv run ruff check src tests
+```
+
+Stack: Python 3.12+, [Scapy](https://scapy.net/), [Typer](https://typer.tiangolo.com/), [pytest](https://docs.pytest.org/), [Ruff](https://docs.astral.sh/ruff/), [uv](https://docs.astral.sh/uv/).
+
+---
+
+## Design notes
+
+- **Five-tuple flows are unidirectional** (same as the C++ simple engine). Server→client replies are a separate flow; once a flow is blocked, later packets with that exact tuple are dropped.
+- **SNI is plaintext only in the TLS Client Hello.** Encrypted application data is not decrypted.
+- **Port fallbacks** mark `:443` as HTTPS and `:80` as HTTP when no deep signal is available.
+- **Non-TCP/UDP frames** (for example ARP) are forwarded unchanged because they cannot form a five-tuple.
+
+---
+
+## Limitations
+
+- Ethernet-framed PCAPs only (parser starts from `Ether`).
+- No live capture; offline files only.
+- No QUIC CRYPTO-frame SNI (optional in the C++ tree; not ported).
+- No multi-threaded LB / fast-path architecture.
+- Classification is best-effort substring matching on domains — not a commercial DPI signature set.
+
+---
 
 ## Responsible use
 
-Only analyze captures that you own or are authorized to inspect. Packet captures can contain sensitive data, including credentials, personal information, browsing metadata, and internal network details. Protect capture files and reports, and share packet contents only when necessary.
+Only analyze captures you own or are authorized to inspect. Packet captures can contain credentials, personal data, and internal network details. Protect input/output files and share packet contents only when necessary.
+
+---
 
 ## License
 
-No project license has been selected. Until a license is added, reuse, modification, and distribution permissions are not explicitly granted.
+No project license has been selected yet. Until a license is added, reuse and redistribution terms are not explicitly granted.
+
+Inspired by [perryvegehan/Packet_analyzer](https://github.com/perryvegehan/Packet_analyzer).

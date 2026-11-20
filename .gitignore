@@ -5,6 +5,17 @@ build/
 dist/
 wheels/
 *.egg-info
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+pytest-tmp/
+test_results.txt
+demo_report.txt
+output.pcap
+test_dpi.pcap
 
 # Virtual environments
 .venv
+.venv/

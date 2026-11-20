@@ -28,14 +28,12 @@ def test_parse_tcp_packet():
     assert result.src_port == 51515
     assert result.dst_port == 443
     assert result.payload_size == 5
+    assert result.payload == b"Hello"
 
 
 def test_parse_udp_packet():
     raw_packet = bytes(
-        Ether()
-        / IP(src="10.0.0.2", dst="1.1.1.1")
-        / UDP(sport=53000, dport=53)
-        / Raw(b"DNS query")
+        Ether() / IP(src="10.0.0.2", dst="1.1.1.1") / UDP(sport=53000, dport=53) / Raw(b"DNS query")
     )
 
     result = PacketParser().parse(timestamp=10.0, raw_data=raw_packet)
@@ -44,6 +42,7 @@ def test_parse_udp_packet():
     assert result.src_port == 53000
     assert result.dst_port == 53
     assert result.payload_size == len(b"DNS query")
+    assert result.payload == b"DNS query"
 
 
 def test_parse_arp_packet():
@@ -58,6 +57,7 @@ def test_parse_arp_packet():
     assert result.dst_ip is None
     assert result.src_port is None
     assert result.dst_port is None
+    assert result.payload == b""
 
 
 def test_parse_ipv6_tcp_packet():
@@ -79,3 +79,4 @@ def test_parse_ipv6_tcp_packet():
     assert result.src_port == 12345
     assert result.dst_port == 443
     assert result.payload_size == len(b"IPv6 test")
+    assert result.payload == b"IPv6 test"

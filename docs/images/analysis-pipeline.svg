@@ -1,81 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="650" viewBox="0 0 1000 650" role="img" aria-labelledby="title desc">
-  <title id="title">Deep Packet Inspection project pipeline</title>
-  <desc id="desc">The implemented PCAP reader and packet parser produce normalized metadata. Planned stages continue through flow tracking, application inspection, classification, rules, and reports or filtered PCAP output.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="720" viewBox="0 0 1100 720" role="img" aria-labelledby="title desc">
+  <title id="title">Deep Packet Inspection end-to-end pipeline</title>
+  <desc id="desc">PCAP input flows through reader, parser, flow tracker, DPI inspection, classifier, rules engine, then to filtered PCAP and reports.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#52708f"/>
+      <path d="M0 0L10 5L0 10Z" fill="#16835d"/>
     </marker>
     <style>
       text { font-family: Arial, Helvetica, sans-serif; fill: #172b4d; }
-      .title { font-size: 25px; font-weight: 700; }
-      .label { font-size: 17px; font-weight: 700; }
-      .detail { font-size: 13px; fill: #42526e; }
-      .box { fill: #f5f8fc; stroke: #52708f; stroke-width: 2; rx: 12; }
-      .live { fill: #e4f7ef; stroke: #16835d; }
-      .planned { fill: #f8f9fb; stroke: #8493a8; stroke-dasharray: 8 6; }
-      .line { fill: none; stroke: #52708f; stroke-width: 2.5; marker-end: url(#arrow); }
-      .futureLine { fill: none; stroke: #8493a8; stroke-width: 2.5; stroke-dasharray: 7 6; marker-end: url(#arrow); }
+      .title { font-size: 24px; font-weight: 700; }
+      .label { font-size: 16px; font-weight: 700; }
+      .detail { font-size: 12px; fill: #42526e; }
+      .live { fill: #e4f7ef; stroke: #16835d; stroke-width: 2; rx: 12; }
+      .line { fill: none; stroke: #16835d; stroke-width: 2.5; marker-end: url(#arrow); }
     </style>
   </defs>
-  <rect width="1000" height="650" fill="#ffffff"/>
-  <text x="500" y="42" text-anchor="middle" class="title">From capture file to useful packet metadata</text>
+  <rect width="1100" height="720" fill="#ffffff"/>
+  <text x="550" y="40" text-anchor="middle" class="title">DPI pipeline — capture to filtered output</text>
 
-  <rect x="28" y="71" width="170" height="54" rx="10" class="live"/>
-  <text x="113" y="95" text-anchor="middle" class="label">PCAP file</text>
-  <text x="113" y="114" text-anchor="middle" class="detail">offline input</text>
+  <rect x="40" y="70" width="160" height="56" class="live"/>
+  <text x="120" y="94" text-anchor="middle" class="label">PCAP input</text>
+  <text x="120" y="112" text-anchor="middle" class="detail">offline capture</text>
 
-  <rect x="242" y="71" width="205" height="54" rx="10" class="live"/>
-  <text x="344" y="95" text-anchor="middle" class="label">PCAP reader</text>
-  <text x="344" y="114" text-anchor="middle" class="detail">timestamp + bytes</text>
+  <rect x="240" y="70" width="180" height="56" class="live"/>
+  <text x="330" y="94" text-anchor="middle" class="label">PCAP reader</text>
+  <text x="330" y="112" text-anchor="middle" class="detail">timestamp + bytes</text>
 
-  <rect x="492" y="71" width="205" height="54" rx="10" class="live"/>
-  <text x="594" y="95" text-anchor="middle" class="label">Packet parser</text>
-  <text x="594" y="114" text-anchor="middle" class="detail">Ethernet, IP, TCP/UDP, ARP</text>
+  <rect x="460" y="70" width="180" height="56" class="live"/>
+  <text x="550" y="94" text-anchor="middle" class="label">Packet parser</text>
+  <text x="550" y="112" text-anchor="middle" class="detail">L2 / L3 / L4 + payload</text>
 
-  <rect x="742" y="71" width="230" height="54" rx="10" class="live"/>
-  <text x="857" y="95" text-anchor="middle" class="label">ParsedPacket</text>
-  <text x="857" y="114" text-anchor="middle" class="detail">normalized metadata</text>
+  <rect x="680" y="70" width="180" height="56" class="live"/>
+  <text x="770" y="94" text-anchor="middle" class="label">Flow tracker</text>
+  <text x="770" y="112" text-anchor="middle" class="detail">five-tuple table</text>
 
-  <path d="M198 98H235" class="line"/>
-  <path d="M447 98H485" class="line"/>
-  <path d="M697 98H735" class="line"/>
+  <rect x="900" y="70" width="160" height="56" class="live"/>
+  <text x="980" y="94" text-anchor="middle" class="label">DPI inspect</text>
+  <text x="980" y="112" text-anchor="middle" class="detail">SNI / Host / DNS</text>
 
-  <rect x="25" y="148" width="185" height="32" rx="16" fill="#e4f7ef"/>
-  <text x="117" y="170" text-anchor="middle" class="detail" font-weight="700">IMPLEMENTED</text>
-  <rect x="25" y="197" width="185" height="32" rx="16" fill="#f1f3f6"/>
-  <text x="117" y="219" text-anchor="middle" class="detail" font-weight="700">PLANNED</text>
+  <path d="M200 98H232" class="line"/>
+  <path d="M420 98H452" class="line"/>
+  <path d="M640 98H672" class="line"/>
+  <path d="M860 98H892" class="line"/>
 
-  <rect x="242" y="268" width="205" height="62" class="planned"/>
-  <text x="344" y="293" text-anchor="middle" class="label">Flow tracker</text>
-  <text x="344" y="314" text-anchor="middle" class="detail">group conversations</text>
+  <rect x="240" y="220" width="200" height="64" class="live"/>
+  <text x="340" y="246" text-anchor="middle" class="label">Classifier</text>
+  <text x="340" y="266" text-anchor="middle" class="detail">map domain → AppType</text>
 
-  <rect x="492" y="268" width="205" height="62" class="planned"/>
-  <text x="594" y="293" text-anchor="middle" class="label">DPI / metadata</text>
-  <text x="594" y="314" text-anchor="middle" class="detail">inspect supported indicators</text>
+  <rect x="500" y="220" width="200" height="64" class="live"/>
+  <text x="600" y="246" text-anchor="middle" class="label">Rules engine</text>
+  <text x="600" y="266" text-anchor="middle" class="detail">IP / app / domain</text>
 
-  <rect x="742" y="268" width="230" height="62" class="planned"/>
-  <text x="857" y="293" text-anchor="middle" class="label">Classifier</text>
-  <text x="857" y="314" text-anchor="middle" class="detail">combine available signals</text>
+  <rect x="760" y="220" width="200" height="64" class="live"/>
+  <text x="860" y="246" text-anchor="middle" class="label">Forward or drop</text>
+  <text x="860" y="266" text-anchor="middle" class="detail">per-flow decision</text>
 
-  <path d="M857 125V230H344V260" class="futureLine"/>
-  <path d="M447 299H485" class="futureLine"/>
-  <path d="M697 299H735" class="futureLine"/>
+  <path d="M980 126V190H340V212" class="line"/>
+  <path d="M440 252H492" class="line"/>
+  <path d="M700 252H752" class="line"/>
 
-  <rect x="492" y="402" width="205" height="62" class="planned"/>
-  <text x="594" y="427" text-anchor="middle" class="label">Rules engine</text>
-  <text x="594" y="448" text-anchor="middle" class="detail">evaluate configured rules</text>
+  <rect x="280" y="380" width="240" height="70" class="live"/>
+  <text x="400" y="410" text-anchor="middle" class="label">Filtered PCAP</text>
+  <text x="400" y="430" text-anchor="middle" class="detail">allowed packets only</text>
 
-  <rect x="258" y="535" width="245" height="62" class="planned"/>
-  <text x="380" y="560" text-anchor="middle" class="label">Filtered PCAP</text>
-  <text x="380" y="581" text-anchor="middle" class="detail">selected packets</text>
+  <rect x="620" y="380" width="240" height="70" class="live"/>
+  <text x="740" y="410" text-anchor="middle" class="label">Processing report</text>
+  <text x="740" y="430" text-anchor="middle" class="detail">counts, apps, domains</text>
 
-  <rect x="684" y="535" width="245" height="62" class="planned"/>
-  <text x="806" y="560" text-anchor="middle" class="label">Reports</text>
-  <text x="806" y="581" text-anchor="middle" class="detail">packet / protocol / flow stats</text>
+  <path d="M820 284V340H400V372" class="line"/>
+  <path d="M860 284V340H740V372" class="line"/>
 
-  <path d="M857 330V372H594V394" class="futureLine"/>
-  <path d="M540 464V497H380V527" class="futureLine"/>
-  <path d="M648 464V497H806V527" class="futureLine"/>
-
-  <text x="500" y="628" text-anchor="middle" class="detail">Solid green = available now · Dashed gray = planned</text>
+  <rect x="120" y="520" width="860" height="140" fill="#f5f8fc" stroke="#52708f" stroke-width="2" rx="12"/>
+  <text x="550" y="555" text-anchor="middle" class="label">Packet journey (single-threaded engine)</text>
+  <text x="550" y="585" text-anchor="middle" class="detail">1. Read frame → 2. Parse headers → 3. Upsert five-tuple flow</text>
+  <text x="550" y="610" text-anchor="middle" class="detail">4. Extract SNI / HTTP Host / DNS when present → 5. Classify application</text>
+  <text x="550" y="635" text-anchor="middle" class="detail">6. Evaluate block rules → 7. Write forwarded packets → 8. Print report</text>
 </svg>

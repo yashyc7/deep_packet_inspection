@@ -19,6 +19,7 @@ class ParsedPacket:
     src_port: int | None
     dst_port: int | None
     payload_size: int
+    payload: bytes = b""
 
 
 class PacketParser:
@@ -34,7 +35,7 @@ class PacketParser:
         src_port = None
         dst_port = None
         protocol = "OTHER"
-        payload_size = 0
+        payload = b""
 
         if Ether in packet:
             src_mac = packet[Ether].src
@@ -59,13 +60,13 @@ class PacketParser:
             transport_layer = packet[TCP]
             src_port = transport_layer.sport
             dst_port = transport_layer.dport
-            payload_size = len(bytes(transport_layer.payload))
+            payload = bytes(transport_layer.payload)
 
         elif UDP in packet:
             transport_layer = packet[UDP]
             src_port = transport_layer.sport
             dst_port = transport_layer.dport
-            payload_size = len(bytes(transport_layer.payload))
+            payload = bytes(transport_layer.payload)
 
         return ParsedPacket(
             timestamp=timestamp,
@@ -76,7 +77,8 @@ class PacketParser:
             protocol=protocol,
             src_port=src_port,
             dst_port=dst_port,
-            payload_size=payload_size,
+            payload_size=len(payload),
+            payload=payload,
         )
 
     @staticmethod
