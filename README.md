@@ -1,6 +1,6 @@
 # Deep Packet Inspection
 
-Python remake of [perryvegehan/Packet_analyzer](https://github.com/perryvegehan/Packet_analyzer): an offline DPI engine that reads a PCAP, parses packets, tracks flows, extracts TLS SNI / HTTP Host / DNS names, classifies applications, applies block rules, writes a filtered PCAP, and prints a processing report.
+An offline DPI engine that reads a PCAP, parses packets, tracks flows, extracts TLS SNI / HTTP Host / DNS names, classifies applications, applies block rules, writes a filtered PCAP, and prints a processing report.
 
 > **Status:** Complete single-threaded offline pipeline (reader → parser → flows → DPI → rules → writer → report). Multi-threaded load-balancer / fast-path workers from the C++ project are intentionally out of scope for this learning remake.
 
